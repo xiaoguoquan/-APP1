@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>锅打灰太狼</title>
+	<style type="text/css">
+		body,#all{
+			width: 320px;
+			height: 480px;
+			margin: 0;
+			background: url(img/game_bg.jpg) 0 0 no-repeat;
+			position: relative;
+		}
+		#head{
+			position: absolute;
+			left: 55px;
+			top: 14px;
+			width: 30px;
+			height: 18px;
+			color: white;
+			font-size: 16px;
+			font-weight: bold;
+		}
+		.countdowm{
+			position: absolute;
+			top: 66px;
+			left: 63px;
+			width: 180px;
+			height: 16px;
+			border-radius: 9px;
+			overflow: hidden;
+		}
+		#count{
+			width: 180px;
+			height: 16px;
+			border-radius: 9px;
+			background-color: #ff4000;
+			margin-left: 0px;
+		}
+		#wolfs{
+			position: absolute;
+			/*width: 1/*08px;
+			height: 101px;*/*/
+			
+		}
+		#wolfs div{
+			position: absolute;
+			width: 108px;
+			height: 101px;
+		}
+		#begging{
+			position: absolute;
+			width: 320px;
+			top: 100px;
+			text-align: center;
+			font-size: 50px;
+			font-weight: bold;
+			color: #ff4000;
+
+		}
+		#ending{
+			position: absolute;
+			top: 200px;
+			width: 320px;
+			text-align: center;
+			font-size: 30px;
+			font-weight: bold;
+			color: white;
+			display: none;
+		}
+		#shuoming{
+			position: absolute;
+			width: 320px;
+			top: 200px;
+			text-align: center;
+			font-size: 30px;
+			font-weight: bold;
+			color: #ff4000;
+		}
+		#jieshu{
+			position: absolute;
+			width: 320px;
+			top: 150px;
+			text-align: center;
+			font-size: 30px;
+			font-weight: bold;
+			color: #ff4000;
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="all">
+		<div id="head"></div>
+		<div class="countdowm">
+			<div id="count"></div>
+		</div>
+		<div id="wolfs"></div>
+		<p id="begging">开始</p>
+		<p id="shuoming">游戏操作说明</p>
+		 <p id="ending">得分</p>
+		 <p id="jieshu">游戏结束</p>
+
+	</div>
+	<script type="text/javascript">
+	var all = document.getElementById('all');
+	var headPoint = document.getElementById('head');
+	var count = document.getElementById('count');
+	var wolfs = document.getElementById('wolfs');
+	var begging = document.getElementById('begging');
+	var ending = document.getElementById('ending');
+	var jieshu = document.getElementById('jieshu');
+	var shuoming = document.getElementById('shuoming')
+	var arrLeft = [20,100,189,20,105,202,32,121,216];
+	var arrTop = [160,115,142,220,192,212,294,274,296];
+	var arrWolf = [];
+	var point = 0;
+	var a = false;
+	begging.onclick = function(){
+		begging.style.display = "none";
+		shuoming.style.display = "none";
+		var dis = setInterval(function(){					//狼
+			var t=0;
+			var upper = true;
+			var wolfer = true;
+			var bg;
+			var points=10;
+			var pos1 = Math.floor(Math.random()*8);
+			while(arrWolf.indexOf(pos1)>-1){
+				pos1 = Math.floor(Math.random()*8);//若会等于前面的数。重新取一个随机数
+			}
+			arrWolf.push(pos1);
+			if(arrWolf.length>4){
+				arrWolf.shift();
+			}
+			var bg1 = Math.random();
+			if(bg1>0.8){
+				bg = "url(img/x.png) no-repeat ";
+				points = -points;
+			}else{
+				bg = "url(img/h.png) no-repeat ";
+			}
+			var newWolf = document.createElement("div");
+			wolfs.appendChild(newWolf);
+			newWolf.style.left = arrLeft[pos1] + "px";
+			newWolf.style.top = arrTop[pos1] + "px";
+
+			newWolf.onclick = function(){					//狼的点击
+				if(a){
+					clearInterval(wolfup);
+					wolfs.removeChild(newWolf);
+				}
+				clearInterval(wolfup);
+				if(wolfer){									//只能点击加分一次
+				point += points
+				headPoint.innerHTML = point;
+				}
+				wolfer = false;
+				t=5;
+				var wolfup2 = setInterval(function(){		//点击后的动画
+					t++;
+					newWolf.style.background = bg +'-'+t*108+"px"+" 0px";
+					if(t>=10){
+						clearInterval(wolfup2);
+						wolfs.removeChild(newWolf);
+					}
+				},200);										 
+				newWolf.onclick = null;
+			}
+			var wolfup = setInterval(function(){			 //newwolf的背景动的计时器
+				if(a){
+					clearInterval(wolfup);
+					wolfs.removeChild(newWolf);
+				}
+				if(t<=4&&upper){
+					t++;
+				}else {
+					t--;
+					upper=false;
+					if(t==0){
+						clearInterval(wolfup);
+						wolfs.removeChild(newWolf);
+						upper = true;
+					}
+				}
+
+				newWolf.style.background = bg +'-'+t*108+"px"+" 0px";
+			}, 100);
+		},500);
+		function time(){								//倒计时	
+			var t=0;
+			var maxT=1000;
+			var chenge = count.offsetWidth;
+			var countdowm = setInterval(function(){
+				t++;
+				count.style.marginLeft = -chenge*t/maxT +"px";
+				if(chenge*t/maxT == count.offsetWidth&&!wolfs.childNode){
+					clearInterval(countdowm);
+					clearInterval(dis);
+					a = true;
+					ending.style.display = "block";
+					jieshu.style.display = "block";
+					ending.innerHTML = "得分"+ point;
+					//wolfs.childNodes.onclick=null;
+				}
+			},17);
+		}
+		time();
+	}
+
+	</script>
+</body>
+</html>
